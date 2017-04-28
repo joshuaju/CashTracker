@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "338892928030",
+    "firebase_url": "https://cashtracker-720c0.firebaseio.com",
+    "project_id": "cashtracker-720c0",
+    "storage_bucket": "cashtracker-720c0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:338892928030:android:726b76ec44196ee0",
+        "android_client_info": {
+          "package_name": "jungen.com.cashtracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "338892928030-2bpk27rq3dpb6atd6oc3otk7qp1lqobm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "jungen.com.cashtracker",
+            "certificate_hash": "85bea05d50700466081adc4afc0b547625f43b97"
+          }
+        },
+        {
+          "client_id": "338892928030-i3f36ibng8pmuau8baidrehjmgfee66n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9fdaFAOjZfKEbxwOkBIxGuGw5JCBsMwg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "338892928030-i3f36ibng8pmuau8baidrehjmgfee66n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

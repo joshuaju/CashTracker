@@ -2,6 +2,7 @@ package jungen.com.cashtracker.model;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
@@ -14,6 +15,8 @@ import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -36,36 +39,52 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
         ListView lvPurchaseList = (ListView) findViewById(R.id.lvPurchase);
-        mPurchaseRef = FirebaseDatabase.getInstance().getReference("purchases");
-        FirebaseListAdapter<Purchase> adapter = new FirebaseListAdapter<Purchase>(this, Purchase.class, R.layout.list_row_purchase, mPurchaseRef) {
-            @Override
-            protected void populateView(View view, Purchase model, int position) {
-                TextView tvCategory = (TextView) view.findViewById(R.id.tvCategory);
-                TextView tvSubcategory = (TextView) view.findViewById(R.id.tvSubcategory);
-                TextView tvDate = (TextView) view.findViewById(R.id.tvDate);
-                TextView tvPrice = (TextView) view.findViewById(R.id.tvPrice);
+        lvPurchaseList.setVisibility(View.INVISIBLE);
 
-                String category = model.getCategory();
-                String subcategory = model.getSubcategory();
-                String date = dateFormat.format(model.getDate());
-                String price = "" + model.getPrice();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            startActivity(new Intent(this, SignInActivity.class));
+        } else {
+            lvPurchaseList.setVisibility(View.VISIBLE);
 
-                tvCategory.setText(category);
-                tvSubcategory.setText(subcategory);
-                tvDate.setText(date);
-                tvPrice.setText(price);
-            }
-        };
-        lvPurchaseList.setAdapter(adapter);
+            mPurchaseRef = FirebaseDatabase.getInstance().getReference(
+                    FirebaseNodes.PURCHASES + "/" + user.getUid());
+
+            FirebaseListAdapter<Purchase> adapter = new FirebaseListAdapter<Purchase>(this,
+                    Purchase.class, R.layout.list_row_purchase, mPurchaseRef) {
+                @Override
+                protected void populateView(View view, Purchase model, int position) {
+                    TextView tvCategory = (TextView) view.findViewById(R.id.tvCategory);
+                    TextView tvSubcategory = (TextView) view.findViewById(R.id.tvSubcategory);
+                    TextView tvDate = (TextView) view.findViewById(R.id.tvDate);
+                    TextView tvPrice = (TextView) view.findViewById(R.id.tvPrice);
+
+                    String category = model.getCategory();
+                    String subcategory = model.getSubcategory();
+                    String date = dateFormat.format(model.getDate());
+                    String price = "" + model.getPrice();
+
+                    tvCategory.setText(category);
+                    tvSubcategory.setText(subcategory);
+                    tvDate.setText(date);
+                    tvPrice.setText(price);
+                }
+            };
+            lvPurchaseList.setAdapter(adapter);
+        }
     }
 
     public void fabOnClick(View view) {
-        //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).show();
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         final View dlgView = getLayoutInflater().inflate(R.layout.dialog_add_purchase, null);
+        EditText etDate = (EditText) dlgView.findViewById(R.id.etDate);
+        etDate.setText(dateFormat.format(new Date()));
         builder.setView(dlgView);
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override

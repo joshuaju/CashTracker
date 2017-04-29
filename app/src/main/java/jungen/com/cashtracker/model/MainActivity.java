@@ -1,5 +1,8 @@
 package jungen.com.cashtracker.model;
 
+import static jungen.com.cashtracker.R.id.etCategory;
+import static jungen.com.cashtracker.R.id.etSubcategory;
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,7 +11,10 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -23,7 +29,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import jungen.com.cashtracker.R;
 
@@ -31,6 +39,10 @@ public class MainActivity extends AppCompatActivity {
 
     private DatabaseReference mPurchaseRef;
     private DateFormat dateFormat = new SimpleDateFormat("dd.MM.yy");
+    private List<String> categorySuggestions;
+    private List<String> subcategorySuggestions;
+    private ArrayAdapter<String> categorySuggestionAdapter;
+    private ArrayAdapter<String> subcategorySuggestionAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        categorySuggestions = new ArrayList<>();
+        subcategorySuggestions = new ArrayList<>();
     }
 
     @Override
@@ -52,10 +67,11 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(this, SignInActivity.class));
         } else {
             lvPurchaseList.setVisibility(View.VISIBLE);
+            categorySuggestions.clear();
+            subcategorySuggestions.clear();
 
             mPurchaseRef = FirebaseDatabase.getInstance().getReference(
                     FirebaseNodes.PURCHASES + "/" + user.getUid());
-
             FirebaseListAdapter<Purchase> adapter = new FirebaseListAdapter<Purchase>(this,
                     Purchase.class, R.layout.list_row_purchase, mPurchaseRef) {
                 @Override
@@ -74,6 +90,15 @@ public class MainActivity extends AppCompatActivity {
                     tvSubcategory.setText(subcategory);
                     tvDate.setText(date);
                     tvPrice.setText(price);
+
+                    if (!categorySuggestions.contains(category)) {
+                        categorySuggestions.add(category);
+                        Log.d("Suggestions", "Add Category:" + category);
+                    }
+                    if (!subcategorySuggestions.contains(subcategory)) {
+                        subcategorySuggestions.add(subcategory);
+                        Log.d("Suggestions", "Add Subcategory:" + subcategory);
+                    }
                 }
             };
             lvPurchaseList.setAdapter(adapter);
@@ -81,16 +106,41 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void fabOnClick(View view) {
+        categorySuggestionAdapter = new ArrayAdapter<String>(this,
+                R.layout.support_simple_spinner_dropdown_item, categorySuggestions);
+        subcategorySuggestionAdapter = new ArrayAdapter<String>(this,
+                R.layout.support_simple_spinner_dropdown_item, subcategorySuggestions);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         final View dlgView = getLayoutInflater().inflate(R.layout.dialog_add_purchase, null);
         EditText etDate = (EditText) dlgView.findViewById(R.id.etDate);
+        final AutoCompleteTextView etCategory = (AutoCompleteTextView) dlgView.findViewById(
+                R.id.etCategory);
+        final AutoCompleteTextView etSubcategory = (AutoCompleteTextView) dlgView.findViewById(
+                R.id.etSubcategory);
+
+        etCategory.setAdapter(categorySuggestionAdapter);
+        etSubcategory.setAdapter(subcategorySuggestionAdapter);
+
+        etCategory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                etCategory.showDropDown();
+            }
+        });
+
+        etSubcategory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                etSubcategory.showDropDown();
+            }
+        });
+
         etDate.setText(dateFormat.format(new Date()));
         builder.setView(dlgView);
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                EditText etCategory = (EditText) dlgView.findViewById(R.id.etCategory);
-                EditText etSubcategory = (EditText) dlgView.findViewById(R.id.etSubcategory);
                 EditText etDate = (EditText) dlgView.findViewById(R.id.etDate);
                 EditText etPrice = (EditText) dlgView.findViewById(R.id.etPrice);
 

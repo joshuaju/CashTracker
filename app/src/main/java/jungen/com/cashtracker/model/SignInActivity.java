@@ -34,7 +34,6 @@ public class SignInActivity extends AppCompatActivity {
                 finish();
                 break;
         }
-
     }
 
     private void signIn(final View view) {
@@ -55,7 +54,8 @@ public class SignInActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 finish();
                             } else {
-                                Snackbar.make(view, "Error. Please try again.", Snackbar.LENGTH_LONG).show();
+                                Snackbar.make(view, "Error. Please try again.",
+                                        Snackbar.LENGTH_LONG).show();
                             }
                         }
                     });

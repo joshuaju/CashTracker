@@ -33,7 +33,7 @@
         app:layout_constraintVertical_bias="0.0"/>
 
     <TextView
-        android:id="@+id/tvDate"
+        android:id="@+id/btnDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginRight="0dp"
@@ -52,6 +52,6 @@
         android:hint="Price"
         android:textAppearance="@android:style/TextAppearance.Material.Body2"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="@+id/tvDate"/>
+        app:layout_constraintRight_toRightOf="@+id/btnDate"/>
 
 </android.support.constraint.ConstraintLayout>

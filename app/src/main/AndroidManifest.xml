@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="jungen.com.cashtracker">
-    <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -15,19 +17,28 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".model.SignInActivity"
+        <activity
+            android:name=".model.SignInActivity"
             android:label="@string/title_activity_sign_in"
             android:parentActivityName=".model.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="jungen.com.cashtracker.model.MainActivity"/>
         </activity>
-        <activity android:name=".model.SignUpActivity"
+        <activity
+            android:name=".model.SignUpActivity"
             android:label="@string/title_activity_sign_up"
+            android:parentActivityName=".model.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="jungen.com.cashtracker.model.MainActivity"/>
+        </activity>
+        <activity
+            android:name=".model.AddPurchaseActivity"
+            android:label="@string/title_activity_add_purchase"
             android:parentActivityName=".model.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

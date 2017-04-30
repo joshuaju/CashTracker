@@ -91,18 +91,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void fabOnClick(View view) {
-        Bundle args = new Bundle();
-        args.putStringArrayList("category", categorySuggestions);
-        args.putStringArrayList("subcategory", subcategorySuggestions);
         Intent intent = new Intent(this, AddPurchaseActivity.class);
-        startActivityForResult(intent, 1);
+        intent.putStringArrayListExtra(AddPurchaseActivity.KEY_CATEGORIES, categorySuggestions);
+        intent.putStringArrayListExtra(AddPurchaseActivity.KEY_SUBCATEGORIES, subcategorySuggestions);
+        startActivityForResult(intent, AddPurchaseActivity.REQUEST_ADD);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
-            case 1:
-                // TODO Process result from AddPurchaseActivity
+            case AddPurchaseActivity.REQUEST_ADD:
+                if (resultCode == RESULT_OK) {
+                    Purchase purchase = (Purchase) data.getSerializableExtra(
+                            Purchase.class.getSimpleName());
+                    mPurchaseRef.push().setValue(purchase);
+                }
                 break;
             default:
                 super.onActivityResult(requestCode, resultCode, data);

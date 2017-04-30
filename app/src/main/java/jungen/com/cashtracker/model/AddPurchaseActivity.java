@@ -1,25 +1,41 @@
 package jungen.com.cashtracker.model;
 
+import static jungen.com.cashtracker.R.id.etCategory;
+
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import jungen.com.cashtracker.R;
 
 public class AddPurchaseActivity extends AppCompatActivity implements
         DatePickerDialog.OnDateSetListener {
+
+    public final static int REQUEST_ADD = 1;
+    public final static int REQUEST_EDIT = 2;
+
+    public final static String KEY_CATEGORIES = "categories";
+    public final static String KEY_SUBCATEGORIES = "subcategories";
+
+    private Purchase mPurchase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,11 +53,26 @@ public class AddPurchaseActivity extends AppCompatActivity implements
                 showDatePicker();
             }
         });
-    }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+        mPurchase = new Purchase();
+        mPurchase.setDate(Calendar.getInstance().getTime());
+
+        ArrayList<String> suggestedCategories = getIntent().getStringArrayListExtra(KEY_CATEGORIES);
+        ArrayList<String> suggestedSubcategories = getIntent().getStringArrayListExtra(
+                KEY_SUBCATEGORIES);
+
+        ArrayAdapter<String> categoriesAdapter = new ArrayAdapter<String>(this,
+                R.layout.support_simple_spinner_dropdown_item, suggestedCategories);
+        ArrayAdapter<String> subcategoriesAdapter = new ArrayAdapter<String>(this,
+                R.layout.support_simple_spinner_dropdown_item, suggestedSubcategories);
+
+        final AutoCompleteTextView etCategory = (AutoCompleteTextView) findViewById(
+                R.id.etCategory);
+        AutoCompleteTextView etSubcategory = (AutoCompleteTextView) findViewById(
+                R.id.etSubcategory);
+
+        etCategory.setAdapter(categoriesAdapter);
+        etSubcategory.setAdapter(subcategoriesAdapter);
     }
 
     @Override
@@ -55,7 +86,10 @@ public class AddPurchaseActivity extends AppCompatActivity implements
         switch (item.getItemId()) {
             case R.id.menu_add:
                 if (isInputValid()) {
-                    Snackbar.make(getCurrentFocus(), "Add Item", Snackbar.LENGTH_LONG).show();
+                    Intent result = new Intent();
+                    result.putExtra(Purchase.class.getSimpleName(), mPurchase);
+                    setResult(RESULT_OK, result);
+                    finish();
                 }
                 return true;
         }
@@ -79,19 +113,24 @@ public class AddPurchaseActivity extends AppCompatActivity implements
         boolean isValid = true;
 
         String categeory = etCategory.getText().toString().trim();
-        if (categeory.length() == 0){
+        if (categeory.length() == 0) {
             etCategory.setError(getString(R.string.error_field_required));
             isValid = false;
+        } else {
+            mPurchase.setCategory(categeory);
         }
         String subcategory = etSubcategory.getText().toString().trim();
+        mPurchase.setSubcategory(subcategory);
 
         String strPrice = etPrice.getText().toString().trim();
-        if (strPrice.length() == 0){
+        if (strPrice.length() == 0) {
             etPrice.setError(getString(R.string.error_field_required));
             isValid = false;
+        } else {
+            mPurchase.setPrice(Double.parseDouble(strPrice));
         }
 
-        if (!isValid){
+        if (!isValid) {
             return false;
         } else {
             return true;
@@ -104,13 +143,15 @@ public class AddPurchaseActivity extends AppCompatActivity implements
         calender.set(year, month, dayOfMonth);
         String date = getDateAsString(calender);
 
-        Button tvDate = (Button) findViewById(R.id.btnDate);
-        tvDate.setText(date);
+        Button btnDate = (Button) findViewById(R.id.btnDate);
+        btnDate.setText(date);
+        mPurchase.setDate(calender.getTime());
     }
 
-    private String getDateAsString(Calendar calendar){
+    private String getDateAsString(Calendar calendar) {
         DateFormat format = SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM);
         String date = format.format(calendar.getTime());
         return date;
     }
+
 }

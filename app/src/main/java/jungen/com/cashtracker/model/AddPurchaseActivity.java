@@ -1,10 +1,7 @@
 package jungen.com.cashtracker.model;
 
-import static jungen.com.cashtracker.R.id.etCategory;
-
 import android.app.DatePickerDialog;
 import android.content.Intent;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -15,9 +12,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -34,6 +28,7 @@ public class AddPurchaseActivity extends AppCompatActivity implements
 
     public final static String KEY_CATEGORIES = "categories";
     public final static String KEY_SUBCATEGORIES = "subcategories";
+    public final static String KEY_POSITION = "position";
 
     private Purchase mPurchase;
 
@@ -54,9 +49,6 @@ public class AddPurchaseActivity extends AppCompatActivity implements
             }
         });
 
-        mPurchase = new Purchase();
-        mPurchase.setDate(Calendar.getInstance().getTime());
-
         ArrayList<String> suggestedCategories = getIntent().getStringArrayListExtra(KEY_CATEGORIES);
         ArrayList<String> suggestedSubcategories = getIntent().getStringArrayListExtra(
                 KEY_SUBCATEGORIES);
@@ -66,13 +58,43 @@ public class AddPurchaseActivity extends AppCompatActivity implements
         ArrayAdapter<String> subcategoriesAdapter = new ArrayAdapter<String>(this,
                 R.layout.support_simple_spinner_dropdown_item, suggestedSubcategories);
 
-        final AutoCompleteTextView etCategory = (AutoCompleteTextView) findViewById(
+        AutoCompleteTextView etCategory = (AutoCompleteTextView) findViewById(
                 R.id.etCategory);
         AutoCompleteTextView etSubcategory = (AutoCompleteTextView) findViewById(
                 R.id.etSubcategory);
 
         etCategory.setAdapter(categoriesAdapter);
         etSubcategory.setAdapter(subcategoriesAdapter);
+
+        Purchase purchase = (Purchase) getIntent().getSerializableExtra(Purchase.class.getSimpleName());
+        if (purchase == null){
+            mPurchase = new Purchase();
+            mPurchase.setDate(Calendar.getInstance().getTime());
+        } else {
+            mPurchase = purchase;
+        }
+        updateText();
+    }
+
+    public void updateText(){
+        AutoCompleteTextView etCategory = (AutoCompleteTextView) findViewById(
+                R.id.etCategory);
+        AutoCompleteTextView etSubcategory = (AutoCompleteTextView) findViewById(
+                R.id.etSubcategory);
+        EditText etPrice = (EditText) findViewById(R.id.etPrice);
+        Button btnDate = (Button) findViewById(R.id.btnDate);
+
+        etCategory.setText(mPurchase.getCategory());
+        etSubcategory.setText(mPurchase.getSubcategory());
+        if (mPurchase.getPrice() > 0) {
+            etPrice.setText("" + mPurchase.getPrice());
+        } else {
+            etPrice.setText("");
+        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(mPurchase.getDate());
+        btnDate.setText(getDateAsString(calendar));
+
     }
 
     @Override
@@ -84,9 +106,9 @@ public class AddPurchaseActivity extends AppCompatActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_add:
+            case R.id.menu_save:
                 if (isInputValid()) {
-                    Intent result = new Intent();
+                    Intent result = getIntent();
                     result.putExtra(Purchase.class.getSimpleName(), mPurchase);
                     setResult(RESULT_OK, result);
                     finish();
@@ -105,6 +127,11 @@ public class AddPurchaseActivity extends AppCompatActivity implements
         dlg.show();
     }
 
+    /**
+     * Checks all input fields and sets error messages if necessary. The member variable {@link AddPurchaseActivity#mPurchase}
+     * stores valid values.
+     * @return True if all inputs are valid. It is safe to use mPurchase. Otherwise false
+     */
     private boolean isInputValid() {
         EditText etCategory = (EditText) findViewById(R.id.etCategory);
         EditText etSubcategory = (EditText) findViewById(R.id.etSubcategory);

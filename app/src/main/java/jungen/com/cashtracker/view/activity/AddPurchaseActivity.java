@@ -1,4 +1,4 @@
-package jungen.com.cashtracker.activity;
+package jungen.com.cashtracker.view.activity;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
@@ -23,8 +23,8 @@ import jungen.com.cashtracker.model.Purchase;
 public class AddPurchaseActivity extends AppCompatActivity implements
         DatePickerDialog.OnDateSetListener {
 
-    public final static int REQUEST_ADD = 1;
-    public final static int REQUEST_EDIT = 2;
+    public final static int REQUEST_ADD_PURCHASE = 1;
+    public final static int REQUEST_EDIT_PURCHASE = 2;
 
     public final static String KEY_CATEGORIES = "categories";
     public final static String KEY_SUBCATEGORIES = "subcategories";

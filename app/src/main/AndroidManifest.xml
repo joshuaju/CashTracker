@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".activity.MainActivity"
+            android:name=".view.activity.MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -21,28 +21,28 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.SignInActivity"
+            android:name=".view.activity.SignInActivity"
             android:label="@string/title_activity_sign_in"
-            android:parentActivityName=".activity.MainActivity">
+            android:parentActivityName=".view.activity.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.MainActivity"/>
+                android:value=".view.activity.MainActivity"/>
         </activity>
         <activity
-            android:name=".activity.SignUpActivity"
+            android:name=".view.activity.SignUpActivity"
             android:label="@string/title_activity_sign_up"
-            android:parentActivityName=".activity.MainActivity">
+            android:parentActivityName=".view.activity.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.MainActivity"/>
+                android:value=".view.activity.MainActivity"/>
         </activity>
         <activity
-            android:name=".activity.AddPurchaseActivity"
+            android:name=".view.activity.AddPurchaseActivity"
             android:label="@string/title_activity_add_purchase"
-            android:parentActivityName=".activity.MainActivity">
+            android:parentActivityName=".view.activity.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.MainActivity"/>
+                android:value=".view.activity.MainActivity"/>
         </activity>
     </application>
 

@@ -51,7 +51,6 @@ public class PurchaseListFragment extends Fragment implements AbsListView.MultiC
      *
      * @return A new instance of fragment PurchaseListFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static PurchaseListFragment newInstance() {
         PurchaseListFragment fragment = new PurchaseListFragment();
         return fragment;

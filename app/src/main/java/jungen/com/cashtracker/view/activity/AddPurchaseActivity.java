@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,11 +14,18 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 
+import com.firebase.ui.database.FirebaseListAdapter;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 
 import jungen.com.cashtracker.R;
 import jungen.com.cashtracker.misc.DateFormatHelper;
+import jungen.com.cashtracker.misc.FirebaseNodes;
 import jungen.com.cashtracker.model.Purchase;
 
 public class AddPurchaseActivity extends AppCompatActivity implements
@@ -50,10 +58,36 @@ public class AddPurchaseActivity extends AppCompatActivity implements
                 R.id.etCategory);
         AutoCompleteTextView etSubcategory = (AutoCompleteTextView) findViewById(
                 R.id.etSubcategory);
-        // TODO set auto complete adapters with values from database
+
+        DatabaseReference ref = FirebaseNodes.createPurchasesOfCurrentUserReference();
+        final ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item);
+        final ArrayAdapter<String> subcategoryAdapter = new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item);
+        etCategory.setAdapter(categoryAdapter);
+        etSubcategory.setAdapter(subcategoryAdapter);
+        ref.addListenerForSingleValueEvent(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for(DataSnapshot tmpSnapshot: dataSnapshot.getChildren()){
+                            String category = tmpSnapshot.child("category").getValue(String.class);
+                            String subcategory = tmpSnapshot.child("subcategory").getValue(String.class);
+                            categoryAdapter.add(category);
+                            if (subcategory != null && subcategory.length() > 0) {
+                                subcategoryAdapter.add(subcategory);
+                            }
+                            Log.d("Adapter", "Add C:" + category + ", SC:" + subcategory);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
 
         Purchase purchase = (Purchase) getIntent().getSerializableExtra(
                 Purchase.class.getSimpleName());
+
         if (purchase == null) {
             mPurchase = new Purchase();
             mPurchase.setTime(Calendar.getInstance().getTimeInMillis());
@@ -95,10 +129,6 @@ public class AddPurchaseActivity extends AppCompatActivity implements
         switch (item.getItemId()) {
             case R.id.menu_save:
                 if (isInputValid()) {
-                    //String category = mPurchase.getCategory();
-                    //String subcategory = mPurchase.getSubcategory();
-                    // TODO push category and subcategory to database
-
                     Intent result = getIntent();
                     result.putExtra(Purchase.class.getSimpleName(), mPurchase);
                     setResult(RESULT_OK, result);

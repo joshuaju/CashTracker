@@ -26,8 +26,6 @@ public class AddPurchaseActivity extends AppCompatActivity implements
     public final static int REQUEST_ADD_PURCHASE = 1;
     public final static int REQUEST_EDIT_PURCHASE = 2;
 
-    public final static String KEY_CATEGORIES = "categories";
-    public final static String KEY_SUBCATEGORIES = "subcategories";
     public final static String KEY_POSITION = "position";
 
     private Purchase mPurchase;
@@ -48,22 +46,11 @@ public class AddPurchaseActivity extends AppCompatActivity implements
             }
         });
 
-        ArrayList<String> suggestedCategories = getIntent().getStringArrayListExtra(KEY_CATEGORIES);
-        ArrayList<String> suggestedSubcategories = getIntent().getStringArrayListExtra(
-                KEY_SUBCATEGORIES);
-
-        ArrayAdapter<String> categoriesAdapter = new ArrayAdapter<String>(this,
-                R.layout.support_simple_spinner_dropdown_item, suggestedCategories);
-        ArrayAdapter<String> subcategoriesAdapter = new ArrayAdapter<String>(this,
-                R.layout.support_simple_spinner_dropdown_item, suggestedSubcategories);
-
         AutoCompleteTextView etCategory = (AutoCompleteTextView) findViewById(
                 R.id.etCategory);
         AutoCompleteTextView etSubcategory = (AutoCompleteTextView) findViewById(
                 R.id.etSubcategory);
-
-        etCategory.setAdapter(categoriesAdapter);
-        etSubcategory.setAdapter(subcategoriesAdapter);
+        // TODO set auto complete adapters with values from database
 
         Purchase purchase = (Purchase) getIntent().getSerializableExtra(
                 Purchase.class.getSimpleName());
@@ -108,6 +95,10 @@ public class AddPurchaseActivity extends AppCompatActivity implements
         switch (item.getItemId()) {
             case R.id.menu_save:
                 if (isInputValid()) {
+                    //String category = mPurchase.getCategory();
+                    //String subcategory = mPurchase.getSubcategory();
+                    // TODO push category and subcategory to database
+
                     Intent result = getIntent();
                     result.putExtra(Purchase.class.getSimpleName(), mPurchase);
                     setResult(RESULT_OK, result);

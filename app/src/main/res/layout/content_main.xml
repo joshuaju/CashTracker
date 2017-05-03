@@ -9,9 +9,9 @@
     android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <fragment
-        android:id="@+id/fragmentPurchaseList"
-        android:name="jungen.com.cashtracker.view.activity.PurchaseListFragment"
+    <!-- PurchaseList fragment is loaded dynamically, because user must be authenticated first -->
+    <FrameLayout
+        android:id="@+id/fragmentPurchaseListContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

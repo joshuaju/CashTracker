@@ -5,6 +5,7 @@ import static android.R.attr.key;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.SparseBooleanArray;
@@ -60,6 +61,17 @@ public class PurchaseListFragment extends Fragment implements AbsListView.MultiC
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         checkedState = new SparseBooleanArray();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_purchase_list, container, false);
+
+        ListView lvPurchaseList;
+        lvPurchaseList = (ListView) view.findViewById(R.id.lvPurchase);
+        lvPurchaseList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        lvPurchaseList.setMultiChoiceModeListener(this);
         mPurchaseRef = FirebaseNodes.createPurchasesOfCurrentUserReference();
         purchaseListAdapter = new FirebaseListAdapter<Purchase>(getActivity(),
                 Purchase.class, R.layout.list_row_purchase, mPurchaseRef) {
@@ -81,17 +93,6 @@ public class PurchaseListFragment extends Fragment implements AbsListView.MultiC
                 tvPrice.setText(price);
             }
         };
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_purchase_list, container, false);
-
-        ListView lvPurchaseList;
-        lvPurchaseList = (ListView) view.findViewById(R.id.lvPurchase);
-        lvPurchaseList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-        lvPurchaseList.setMultiChoiceModeListener(this);
         lvPurchaseList.setAdapter(purchaseListAdapter);
         return view;
     }

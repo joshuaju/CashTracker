@@ -15,6 +15,10 @@ public class FirebaseNodes {
 
     public static DatabaseReference createPurchasesOfCurrentUserReference(){
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        return FirebaseDatabase.getInstance().getReference(PURCHASES + "/" + user.getUid());
+        if (user != null) {
+            return FirebaseDatabase.getInstance().getReference(PURCHASES + "/" + user.getUid());
+        } else {
+            throw new RuntimeException("No current user");
+        }
     }
 }

@@ -20,14 +20,13 @@ import jungen.com.cashtracker.misc.CredentialHelper;
 
 public class SignUpActivity extends AppCompatActivity {
 
-    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
-
-        mAuth = FirebaseAuth.getInstance();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().setSubtitle(R.string.title_activity_sign_up);
     }
 
     public void onClick(final View view) {
@@ -41,7 +40,7 @@ public class SignUpActivity extends AppCompatActivity {
             String email = CredentialHelper.getEmail(etEmail);
             String password = CredentialHelper.getPassword(etPassword);
 
-            mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this,
+            FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password).addOnCompleteListener(this,
                     new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {

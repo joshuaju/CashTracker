@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
@@ -21,7 +22,14 @@ public class SignInActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sign_in);
+        if (FirebaseAuth.getInstance().getCurrentUser() != null){
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
+        } else {
+            setContentView(R.layout.activity_sign_in);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            getSupportActionBar().setSubtitle(R.string.title_activity_sign_in);
+        }
     }
 
     public void onClick(View view) {
@@ -53,6 +61,7 @@ public class SignInActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
+                                startActivity(new Intent(SignInActivity.this, MainActivity.class));
                                 finish();
                             } else {
                                 Snackbar.make(view, "Error. Please try again.",
@@ -62,4 +71,5 @@ public class SignInActivity extends AppCompatActivity {
                     });
         }
     }
+
 }

@@ -1,7 +1,4 @@
-package jungen.com.cashtracker.model;
-
-import static android.R.attr.checked;
-import static android.R.attr.key;
+package jungen.com.cashtracker.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -28,6 +25,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import jungen.com.cashtracker.R;
+import jungen.com.cashtracker.misc.FirebaseNodes;
+import jungen.com.cashtracker.model.Purchase;
 
 public class MainActivity extends AppCompatActivity implements AbsListView.MultiChoiceModeListener {
 
@@ -66,6 +65,21 @@ public class MainActivity extends AppCompatActivity implements AbsListView.Multi
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.menu_logout){
+            FirebaseAuth.getInstance().signOut();
+            startActivity(new Intent(this, SignInActivity.class));
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
         lvPurchaseList.setVisibility(View.INVISIBLE);
@@ -86,17 +100,17 @@ public class MainActivity extends AppCompatActivity implements AbsListView.Multi
                 protected void populateView(View view, Purchase model, int position) {
                     TextView tvCategory = (TextView) view.findViewById(R.id.tvCategory);
                     TextView tvSubcategory = (TextView) view.findViewById(R.id.tvSubcategory);
-                    TextView tvDate = (TextView) view.findViewById(R.id.btnDate);
+                    TextView tvDate = (TextView) view.findViewById(R.id.btnTime);
                     TextView tvPrice = (TextView) view.findViewById(R.id.tvPrice);
 
                     String category = model.getCategory();
                     String subcategory = model.getSubcategory();
-                    String date = dateFormat.format(model.getDate());
-                    String price = "" + model.getPrice();
+                    String time = model.getTimeAsString();
+                    String price = model.getPriceAsString();
 
                     tvCategory.setText(category);
                     tvSubcategory.setText(subcategory);
-                    tvDate.setText(date);
+                    tvDate.setText(time);
                     tvPrice.setText(price);
 
                     if (!categorySuggestions.contains(category)) {

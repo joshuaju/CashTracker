@@ -9,6 +9,6 @@
     android:clipToPadding="false"
     android:paddingBottom="64dp"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="jungen.com.cashtracker.model.MainActivity"
+    tools:context=".activity.MainActivity"
     tools:showIn="@layout/activity_main">
 </ListView>

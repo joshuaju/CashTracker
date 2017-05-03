@@ -1,4 +1,4 @@
-package jungen.com.cashtracker.model;
+package jungen.com.cashtracker;
 
 import android.content.Context;
 import android.support.annotation.AttrRes;

@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".model.MainActivity"
+            android:name=".activity.MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -21,28 +21,28 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".model.SignInActivity"
+            android:name=".activity.SignInActivity"
             android:label="@string/title_activity_sign_in"
-            android:parentActivityName=".model.MainActivity">
+            android:parentActivityName=".activity.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="jungen.com.cashtracker.model.MainActivity"/>
+                android:value=".activity.MainActivity"/>
         </activity>
         <activity
-            android:name=".model.SignUpActivity"
+            android:name=".activity.SignUpActivity"
             android:label="@string/title_activity_sign_up"
-            android:parentActivityName=".model.MainActivity">
+            android:parentActivityName=".activity.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="jungen.com.cashtracker.model.MainActivity"/>
+                android:value=".activity.MainActivity"/>
         </activity>
         <activity
-            android:name=".model.AddPurchaseActivity"
+            android:name=".activity.AddPurchaseActivity"
             android:label="@string/title_activity_add_purchase"
-            android:parentActivityName=".model.MainActivity">
+            android:parentActivityName=".activity.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="jungen.com.cashtracker.model.MainActivity"/>
+                android:value=".activity.MainActivity"/>
         </activity>
     </application>
 

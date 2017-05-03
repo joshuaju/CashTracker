@@ -1,7 +1,6 @@
-package jungen.com.cashtracker.model;
+package jungen.com.cashtracker.activity;
 
-import static jungen.com.cashtracker.R.id.etPassword;
-import static jungen.com.cashtracker.model.CredentialHelper.isPasswordValid;
+import static jungen.com.cashtracker.misc.CredentialHelper.isPasswordValid;
 
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -17,6 +16,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
 import jungen.com.cashtracker.R;
+import jungen.com.cashtracker.misc.CredentialHelper;
 
 public class SignUpActivity extends AppCompatActivity {
 

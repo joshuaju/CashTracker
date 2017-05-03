@@ -1,4 +1,4 @@
-package jungen.com.cashtracker.model;
+package jungen.com.cashtracker.misc;
 
 import static android.R.attr.password;
 

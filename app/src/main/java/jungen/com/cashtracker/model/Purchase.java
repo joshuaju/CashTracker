@@ -1,29 +1,32 @@
 package jungen.com.cashtracker.model;
 
+import com.google.firebase.database.Exclude;
+
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.function.Consumer;
+
+import jungen.com.cashtracker.misc.DateFormatHelper;
 
 
 /**
- *
  * Created by Joshua Jungen on 27.04.2017.
  */
 public class Purchase implements Serializable {
 
     private String category;
     private String subcategory;
-    private Date date;
+    private long time;
     private double price;
 
-    public Purchase(){
+    public Purchase() {
 
     }
 
-    public Purchase(String category, String subcategory, Date date, double price) {
+    public Purchase(String category, String subcategory, long time, double price) {
         this.category = category;
         this.subcategory = subcategory;
-        this.date = date;
+        this.time = time;
         this.price = price;
     }
 
@@ -43,12 +46,12 @@ public class Purchase implements Serializable {
         this.subcategory = subcategory;
     }
 
-    public Date getDate() {
-        return date;
+    public long getTime() {
+        return time;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setTime(long time) {
+        this.time = time;
     }
 
     public double getPrice() {
@@ -57,5 +60,17 @@ public class Purchase implements Serializable {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    @Exclude
+    public String getPriceAsString(){
+        return "" + getPrice();
+    }
+
+    @Exclude
+    public String getTimeAsString(){
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(getTime());
+        return DateFormatHelper.format(cal);
     }
 }

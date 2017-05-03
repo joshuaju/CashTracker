@@ -1,4 +1,4 @@
-package jungen.com.cashtracker.model;
+package jungen.com.cashtracker.activity;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -14,6 +14,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
 import jungen.com.cashtracker.R;
+import jungen.com.cashtracker.misc.CredentialHelper;
 
 public class SignInActivity extends AppCompatActivity {
 

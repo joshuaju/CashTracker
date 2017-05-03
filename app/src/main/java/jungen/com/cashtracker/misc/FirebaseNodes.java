@@ -1,4 +1,4 @@
-package jungen.com.cashtracker.model;
+package jungen.com.cashtracker.misc;
 
 /**
  * Created by Joshua Jungen on 29.04.2017.

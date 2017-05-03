@@ -1,4 +1,4 @@
-package jungen.com.cashtracker.model;
+package jungen.com.cashtracker.activity;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
@@ -13,12 +13,12 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
 import jungen.com.cashtracker.R;
+import jungen.com.cashtracker.misc.DateFormatHelper;
+import jungen.com.cashtracker.model.Purchase;
 
 public class AddPurchaseActivity extends AppCompatActivity implements
         DatePickerDialog.OnDateSetListener {
@@ -40,8 +40,7 @@ public class AddPurchaseActivity extends AppCompatActivity implements
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close_white_24dp);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        Button tvDate = (Button) findViewById(R.id.btnDate);
-        tvDate.setText(getDateAsString(Calendar.getInstance()));
+        Button tvDate = (Button) findViewById(R.id.btnTime);
         tvDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -66,23 +65,24 @@ public class AddPurchaseActivity extends AppCompatActivity implements
         etCategory.setAdapter(categoriesAdapter);
         etSubcategory.setAdapter(subcategoriesAdapter);
 
-        Purchase purchase = (Purchase) getIntent().getSerializableExtra(Purchase.class.getSimpleName());
-        if (purchase == null){
+        Purchase purchase = (Purchase) getIntent().getSerializableExtra(
+                Purchase.class.getSimpleName());
+        if (purchase == null) {
             mPurchase = new Purchase();
-            mPurchase.setDate(Calendar.getInstance().getTime());
+            mPurchase.setTime(Calendar.getInstance().getTimeInMillis());
         } else {
             mPurchase = purchase;
         }
         updateText();
     }
 
-    public void updateText(){
+    public void updateText() {
         AutoCompleteTextView etCategory = (AutoCompleteTextView) findViewById(
                 R.id.etCategory);
         AutoCompleteTextView etSubcategory = (AutoCompleteTextView) findViewById(
                 R.id.etSubcategory);
         EditText etPrice = (EditText) findViewById(R.id.etPrice);
-        Button btnDate = (Button) findViewById(R.id.btnDate);
+        Button btnDate = (Button) findViewById(R.id.btnTime);
 
         etCategory.setText(mPurchase.getCategory());
         etSubcategory.setText(mPurchase.getSubcategory());
@@ -92,8 +92,8 @@ public class AddPurchaseActivity extends AppCompatActivity implements
             etPrice.setText("");
         }
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(mPurchase.getDate());
-        btnDate.setText(getDateAsString(calendar));
+        calendar.setTimeInMillis(mPurchase.getTime());
+        btnDate.setText(DateFormatHelper.format(calendar));
 
     }
 
@@ -119,17 +119,20 @@ public class AddPurchaseActivity extends AppCompatActivity implements
     }
 
     private void showDatePicker() {
-        Calendar cal = Calendar.getInstance();
-        DatePickerDialog dlg = new DatePickerDialog(this, this, cal.get(Calendar.YEAR),
-                cal.get(Calendar.MONTH), cal.get(
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(mPurchase.getTime());
+        DatePickerDialog dlg = new DatePickerDialog(this, this, calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH), calendar.get(
 
                 Calendar.DAY_OF_MONTH));
         dlg.show();
     }
 
     /**
-     * Checks all input fields and sets error messages if necessary. The member variable {@link AddPurchaseActivity#mPurchase}
+     * Checks all input fields and sets error messages if necessary. The member variable {@link
+     * AddPurchaseActivity#mPurchase}
      * stores valid values.
+     *
      * @return True if all inputs are valid. It is safe to use mPurchase. Otherwise false
      */
     private boolean isInputValid() {
@@ -166,19 +169,13 @@ public class AddPurchaseActivity extends AppCompatActivity implements
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-        Calendar calender = Calendar.getInstance();
-        calender.set(year, month, dayOfMonth);
-        String date = getDateAsString(calender);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, dayOfMonth);
+        String date = DateFormatHelper.format(calendar);
 
-        Button btnDate = (Button) findViewById(R.id.btnDate);
+        Button btnDate = (Button) findViewById(R.id.btnTime);
         btnDate.setText(date);
-        mPurchase.setDate(calender.getTime());
-    }
-
-    private String getDateAsString(Calendar calendar) {
-        DateFormat format = SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM);
-        String date = format.format(calendar.getTime());
-        return date;
+        mPurchase.setTime(calendar.getTimeInMillis());
     }
 
 }

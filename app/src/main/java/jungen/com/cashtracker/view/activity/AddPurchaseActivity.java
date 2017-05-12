@@ -4,7 +4,6 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,14 +13,13 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 
-import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 
 import jungen.com.cashtracker.R;
 import jungen.com.cashtracker.misc.DateFormatHelper;
@@ -59,7 +57,7 @@ public class AddPurchaseActivity extends AppCompatActivity implements
         AutoCompleteTextView etSubcategory = (AutoCompleteTextView) findViewById(
                 R.id.etSubcategory);
 
-        DatabaseReference ref = FirebaseNodes.createPurchasesOfCurrentUserReference();
+        DatabaseReference ref = FirebaseNodes.getInstance().getQueriedPurchases().getRef();
         final ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item);
         final ArrayAdapter<String> subcategoryAdapter = new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item);
         etCategory.setAdapter(categoryAdapter);
@@ -68,14 +66,20 @@ public class AddPurchaseActivity extends AppCompatActivity implements
                 new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
+                        HashMap<String, Boolean> checkedCategory = new HashMap<String, Boolean>();
+                        HashMap<String, Boolean> checkedSubategory = new HashMap<String, Boolean>();
                         for(DataSnapshot tmpSnapshot: dataSnapshot.getChildren()){
                             String category = tmpSnapshot.child("category").getValue(String.class);
                             String subcategory = tmpSnapshot.child("subcategory").getValue(String.class);
-                            categoryAdapter.add(category);
-                            if (subcategory != null && subcategory.length() > 0) {
-                                subcategoryAdapter.add(subcategory);
+
+                            if (!checkedCategory.containsKey(category)) {
+                                categoryAdapter.add(category);
+                                checkedCategory.put(category, true);
                             }
-                            Log.d("Adapter", "Add C:" + category + ", SC:" + subcategory);
+                            if (subcategory != null && subcategory.length() > 0 && !checkedSubategory.containsKey(subcategory)) {
+                                subcategoryAdapter.add(subcategory);
+                                checkedSubategory.put(subcategory, true);
+                            }
                         }
                     }
 

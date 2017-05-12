@@ -2,7 +2,7 @@ package jungen.com.cashtracker.view.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -11,23 +11,22 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
-
-import java.util.ArrayList;
 
 import jungen.com.cashtracker.R;
 import jungen.com.cashtracker.misc.FirebaseNodes;
 import jungen.com.cashtracker.model.Purchase;
+import jungen.com.cashtracker.view.fragment.PurchaseInfoFragment;
+import jungen.com.cashtracker.view.fragment.PurchaseListFragment;
 
 public class MainActivity extends AppCompatActivity implements
-        PurchaseListFragment.OnPurchaseListFragmentInteractionListener {
+        PurchaseListFragment.OnPurchaseListFragmentInteractionListener, PurchaseInfoFragment.OnPurchaseInfoFragmentInteractionListener {
     public static final int REQUEST_FINISH = -1;
     /**
      * Reference to purchase node of the current user
      */
-    private DatabaseReference mPurchaseRef;
     private PurchaseListFragment mPurchaseListFragment;
+    private PurchaseInfoFragment mPurchaseInfoFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,11 +40,13 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        mPurchaseRef = FirebaseNodes.createPurchasesOfCurrentUserReference();
         mPurchaseListFragment = PurchaseListFragment.newInstance();
-        getSupportFragmentManager().beginTransaction().add(R.id.fragmentPurchaseListContainer,
-                mPurchaseListFragment).commit();
+        mPurchaseInfoFragment = PurchaseInfoFragment.newInstance();
 
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragmentPurchaseListContainer, mPurchaseListFragment)
+                .add(R.id.fragmentPurchaseInfoContainer, mPurchaseInfoFragment)
+                .commit();
     }
 
     @Override

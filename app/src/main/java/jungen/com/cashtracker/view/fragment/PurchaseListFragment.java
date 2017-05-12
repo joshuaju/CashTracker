@@ -1,11 +1,7 @@
-package jungen.com.cashtracker.view.activity;
-
-import static android.R.attr.key;
+package jungen.com.cashtracker.view.fragment;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.SparseBooleanArray;
@@ -21,9 +17,12 @@ import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 
 import jungen.com.cashtracker.R;
 import jungen.com.cashtracker.misc.FirebaseNodes;
+import jungen.com.cashtracker.misc.PurchaseQueryPublisher;
+import jungen.com.cashtracker.misc.PurchaseQuerySubscriber;
 import jungen.com.cashtracker.model.Purchase;
 
 /**
@@ -34,15 +33,17 @@ import jungen.com.cashtracker.model.Purchase;
  * Use the {@link PurchaseListFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PurchaseListFragment extends Fragment implements AbsListView.MultiChoiceModeListener {
+public class PurchaseListFragment extends Fragment implements AbsListView.MultiChoiceModeListener,
+        PurchaseQuerySubscriber {
 
     private OnPurchaseListFragmentInteractionListener mListener;
-    private DatabaseReference mPurchaseRef;
     private SparseBooleanArray checkedState;
+    private ListView lvPurchaseList;
     FirebaseListAdapter<Purchase> purchaseListAdapter;
 
     public PurchaseListFragment() {
-        // Required empty public constructor
+        PurchaseQueryPublisher publisher = FirebaseNodes.getInstance();
+        publisher.subscribe(this);
     }
 
     /**
@@ -67,13 +68,40 @@ public class PurchaseListFragment extends Fragment implements AbsListView.MultiC
             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_purchase_list, container, false);
 
-        ListView lvPurchaseList;
         lvPurchaseList = (ListView) view.findViewById(R.id.lvPurchase);
         lvPurchaseList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         lvPurchaseList.setMultiChoiceModeListener(this);
-        mPurchaseRef = FirebaseNodes.createPurchasesOfCurrentUserReference();
+
+        updateQueryChanged();
+        return view;
+    }
+
+    @Override
+    public void updateQueryChanged() {
+        Query query = FirebaseNodes.getInstance().getQueriedPurchases();
+        updatePurchaseListAdapter(query);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnPurchaseListFragmentInteractionListener) {
+            mListener = (OnPurchaseListFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnPurchaseListFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    private void updatePurchaseListAdapter(Query reference) {
         purchaseListAdapter = new FirebaseListAdapter<Purchase>(getActivity(),
-                Purchase.class, R.layout.list_row_purchase, mPurchaseRef) {
+                Purchase.class, R.layout.list_row_purchase, reference) {
             @Override
             protected void populateView(View view, Purchase model, int position) {
                 TextView tvCategory = (TextView) view.findViewById(R.id.tvCategory);
@@ -93,24 +121,6 @@ public class PurchaseListFragment extends Fragment implements AbsListView.MultiC
             }
         };
         lvPurchaseList.setAdapter(purchaseListAdapter);
-        return view;
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnPurchaseListFragmentInteractionListener) {
-            mListener = (OnPurchaseListFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnPurchaseListFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
     }
 
     @Override
@@ -188,8 +198,9 @@ public class PurchaseListFragment extends Fragment implements AbsListView.MultiC
         void requestForEdit(int pos, Purchase purchase);
     }
 
-    public void addPurchase(Purchase purchase){
-        mPurchaseRef.push().setValue(purchase);
+    public void addPurchase(Purchase purchase) {
+        DatabaseReference ref = FirebaseNodes.getInstance().getUserPurchaseReference();
+        ref.push().setValue(purchase);
     }
 
     public void editPurchase(int position, Purchase updatedPurchase) {

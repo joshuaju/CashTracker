@@ -58,25 +58,31 @@ public class AddPurchaseActivity extends AppCompatActivity implements
                 R.id.etSubcategory);
 
         DatabaseReference ref = FirebaseNodes.getInstance().getQueriedPurchases().getRef();
-        final ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item);
-        final ArrayAdapter<String> subcategoryAdapter = new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item);
+        final ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(this,
+                R.layout.support_simple_spinner_dropdown_item);
+        final ArrayAdapter<String> subcategoryAdapter = new ArrayAdapter<String>(this,
+                R.layout.support_simple_spinner_dropdown_item);
         etCategory.setAdapter(categoryAdapter);
         etSubcategory.setAdapter(subcategoryAdapter);
         ref.addListenerForSingleValueEvent(
                 new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
+                        // the two HashMaps make sure that there are no duplicate entries in the
+                        // autocomplete adapters
                         HashMap<String, Boolean> checkedCategory = new HashMap<String, Boolean>();
                         HashMap<String, Boolean> checkedSubategory = new HashMap<String, Boolean>();
-                        for(DataSnapshot tmpSnapshot: dataSnapshot.getChildren()){
+                        for (DataSnapshot tmpSnapshot : dataSnapshot.getChildren()) {
                             String category = tmpSnapshot.child("category").getValue(String.class);
-                            String subcategory = tmpSnapshot.child("subcategory").getValue(String.class);
+                            String subcategory = tmpSnapshot.child("subcategory").getValue(
+                                    String.class);
 
                             if (!checkedCategory.containsKey(category)) {
                                 categoryAdapter.add(category);
                                 checkedCategory.put(category, true);
                             }
-                            if (subcategory != null && subcategory.length() > 0 && !checkedSubategory.containsKey(subcategory)) {
+                            if (subcategory != null && subcategory.length() > 0
+                                    && !checkedSubategory.containsKey(subcategory)) {
                                 subcategoryAdapter.add(subcategory);
                                 checkedSubategory.put(subcategory, true);
                             }

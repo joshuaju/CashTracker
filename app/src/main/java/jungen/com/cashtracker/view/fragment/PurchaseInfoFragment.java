@@ -1,8 +1,13 @@
 package jungen.com.cashtracker.view.fragment;
 
+import static android.R.attr.max;
+import static android.content.Context.MODE_PRIVATE;
+
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +26,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 
 import jungen.com.cashtracker.R;
+import jungen.com.cashtracker.misc.DateFormatHelper;
 import jungen.com.cashtracker.misc.FirebaseNodes;
 import jungen.com.cashtracker.misc.PurchaseQueryPublisher;
 import jungen.com.cashtracker.misc.PurchaseQuerySubscriber;
@@ -66,12 +72,23 @@ public class PurchaseInfoFragment extends Fragment implements PurchaseQuerySubsc
         tvTotal = (TextView) view.findViewById(R.id.tvTotal);
 
         String[] intervals = getResources().getStringArray(R.array.spinner_interval_entries);
-        spnInterval.setAdapter(new ArrayAdapter<String>(getActivity(), R.layout.support_simple_spinner_dropdown_item, intervals));
+        spnInterval.setAdapter(new ArrayAdapter<String>(getActivity(),
+                R.layout.support_simple_spinner_dropdown_item, intervals));
         spnInterval.setOnItemSelectedListener(this);
 
 
         tvTotal.setText("0");
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Spinner spnInterval = (Spinner) getView().findViewById(R.id.spnInterval);
+        int position = loadSpinnerPosition();
+        if (position != -1 && position < spnInterval.getAdapter().getCount()){
+            spnInterval.setSelection(position);
+        }
     }
 
     @Override
@@ -113,14 +130,16 @@ public class PurchaseInfoFragment extends Fragment implements PurchaseQuerySubsc
             }
 
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) { }
+            public void onCancelled(DatabaseError databaseError) {
+            }
         });
     }
 
-    private void addPurchase(String key, Purchase purchase){
+    private void addPurchase(String key, Purchase purchase) {
         double amount = purchase.getPrice();
         mPurchaseMapping.put(key, amount);
         addToTotal(amount);
@@ -128,7 +147,7 @@ public class PurchaseInfoFragment extends Fragment implements PurchaseQuerySubsc
         updateTotalView();
     }
 
-    private void updatePurchase(String key, Purchase purchase){
+    private void updatePurchase(String key, Purchase purchase) {
         Double oldAmount = mPurchaseMapping.get(key);
         double newAmount = purchase.getPrice();
         mPurchaseMapping.put(key, newAmount);
@@ -138,7 +157,7 @@ public class PurchaseInfoFragment extends Fragment implements PurchaseQuerySubsc
         updateTotalView();
     }
 
-    private void removePurchase(String key, Purchase purchase){
+    private void removePurchase(String key, Purchase purchase) {
         mPurchaseMapping.remove(key);
         double amount = purchase.getPrice();
         deductFromTotal(amount);
@@ -146,15 +165,15 @@ public class PurchaseInfoFragment extends Fragment implements PurchaseQuerySubsc
         updateTotalView();
     }
 
-    private void addToTotal(double amount){
+    private void addToTotal(double amount) {
         mTotal += amount;
     }
 
-    private void deductFromTotal(double amount){
+    private void deductFromTotal(double amount) {
         mTotal -= amount;
     }
 
-    private void updateTotalView(){
+    private void updateTotalView() {
         DecimalFormat format = new DecimalFormat("0.00");
         String strTotal = format.format(mTotal);
         tvTotal.setText(strTotal);
@@ -162,42 +181,66 @@ public class PurchaseInfoFragment extends Fragment implements PurchaseQuerySubsc
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            Calendar start = Calendar.getInstance();
-            Calendar end = Calendar.getInstance();
-            String interval = parent.getItemAtPosition(position).toString();
-            if (interval.equals("All time")){
-                FirebaseNodes.getInstance().setPurchaseQuery(null);
-                return;
-            } else if (interval.equals("Year")) {
-                start.set(Calendar.MONTH, Calendar.JANUARY);
-                start.set(Calendar.DAY_OF_MONTH, start.getActualMinimum(Calendar.DAY_OF_MONTH));
-                end.set(Calendar.MONTH, Calendar.DECEMBER);
-                end.set(Calendar.DAY_OF_MONTH, end.getActualMaximum(Calendar.DAY_OF_MONTH));
-            } else if (interval.equals("Month")) {
-                start.set(Calendar.DAY_OF_MONTH, start.getActualMinimum(Calendar.DAY_OF_MONTH));
-                end.set(Calendar.DAY_OF_MONTH, end.getActualMaximum(Calendar.DAY_OF_MONTH));
-            } else if (interval.equals("Week")) {
-                start.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-                start.set(Calendar.HOUR_OF_DAY, start.getActualMinimum(Calendar.HOUR_OF_DAY));
-                end.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-                end.set(Calendar.HOUR_OF_DAY, end.getActualMaximum(Calendar.HOUR_OF_DAY));
-            } else if (interval.equals("Day")) {
-                start.set(Calendar.HOUR_OF_DAY, start.getActualMinimum(Calendar.HOUR_OF_DAY));
-                end.set(Calendar.HOUR_OF_DAY, end.getActualMaximum(Calendar.HOUR_OF_DAY));
-            }
-            long startInMillis = start.getTimeInMillis();
-            long endInMillis = end.getTimeInMillis();
+        saveSpinnerPosition(position);
 
-            FirebaseNodes nodes = FirebaseNodes.getInstance();
-            nodes.clearPurchaseQuery(false);
-            Query query = nodes.getQueriedPurchases().startAt(startInMillis).endAt(endInMillis);
-            nodes.setPurchaseQuery(query);
+        Calendar start = Calendar.getInstance();
+        Calendar end = Calendar.getInstance();
+        start.setFirstDayOfWeek(Calendar.MONDAY);
+        end.setFirstDayOfWeek(Calendar.MONDAY);
 
+        String interval = parent.getItemAtPosition(position).toString();
+        if (interval.equals("All time")) {
+            FirebaseNodes.getInstance().setPurchaseQuery(null);
+            return;
+        } else if (interval.equals("Year")) {
+            start.set(Calendar.MONTH, Calendar.JANUARY);
+            start.set(Calendar.DAY_OF_MONTH, start.getActualMinimum(Calendar.DAY_OF_MONTH));
+            end.set(Calendar.MONTH, Calendar.DECEMBER);
+            end.set(Calendar.DAY_OF_MONTH, end.getActualMaximum(Calendar.DAY_OF_MONTH));
+        } else if (interval.equals("Month")) {
+            start.set(Calendar.DAY_OF_MONTH, start.getActualMinimum(Calendar.DAY_OF_MONTH));
+            end.set(Calendar.DAY_OF_MONTH, end.getActualMaximum(Calendar.DAY_OF_MONTH));
+        } else if (interval.equals("Week")) {
+            int min = start.getFirstDayOfWeek() - start.get(Calendar.DAY_OF_WEEK);
+            start.set(Calendar.DAY_OF_WEEK, min);
+            end = (Calendar) start.clone();
+            end.add(Calendar.DAY_OF_YEAR, 6);
+        } else if (interval.equals("Day")) {
+            // nothing to do
+        }
+        start.set(Calendar.HOUR_OF_DAY, start.getActualMinimum(Calendar.HOUR_OF_DAY));
+        end.set(Calendar.HOUR_OF_DAY, end.getActualMaximum(Calendar.HOUR_OF_DAY));
+
+        Log.d("Interval",
+                "From " + DateFormatHelper.format(start) + " to " + DateFormatHelper.format(end));
+
+        FirebaseNodes nodes = FirebaseNodes.getInstance();
+        nodes.clearPurchaseQuery(false);
+
+        long startInMillis = start.getTimeInMillis();
+        long endInMillis = end.getTimeInMillis();
+        Query query = nodes.getQueriedPurchases().startAt(startInMillis).endAt(endInMillis);
+
+        nodes.setPurchaseQuery(query);
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-        // TODO Check whether possible, if yes remove query so no purchases are display or set spinner to 'All time'
+        // TODO Check whether possible, if yes remove query so no purchases are display or set
+        // spinner to 'All time'
+    }
+
+    private void saveSpinnerPosition(int position){
+        SharedPreferences sharedPref = getActivity().getSharedPreferences("SavedStates",0);
+        SharedPreferences.Editor prefEditor = sharedPref.edit();
+        prefEditor.putInt("interval-spinner-position", position);
+        prefEditor.commit();
+    }
+
+    private int loadSpinnerPosition(){
+        SharedPreferences sharedPref = getActivity().getSharedPreferences("SavedStates",MODE_PRIVATE);
+        int position = sharedPref.getInt("interval-spinner-position",-1);
+        return position;
     }
 
     /**

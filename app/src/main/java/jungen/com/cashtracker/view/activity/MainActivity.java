@@ -40,12 +40,15 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        mPurchaseListFragment = PurchaseListFragment.newInstance();
-        mPurchaseInfoFragment = PurchaseInfoFragment.newInstance();
+        if (mPurchaseListFragment == null)
+            mPurchaseListFragment = PurchaseListFragment.newInstance();
+
+        if (mPurchaseInfoFragment == null)
+            mPurchaseInfoFragment = PurchaseInfoFragment.newInstance();
 
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragmentPurchaseListContainer, mPurchaseListFragment)
-                .add(R.id.fragmentPurchaseInfoContainer, mPurchaseInfoFragment)
+                .replace(R.id.fragmentPurchaseListContainer, mPurchaseListFragment)
+                .replace(R.id.fragmentPurchaseInfoContainer, mPurchaseInfoFragment)
                 .commit();
     }
 

@@ -2,7 +2,13 @@ package jungen.com.cashtracker.view.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -20,7 +26,9 @@ import jungen.com.cashtracker.view.fragment.PurchaseInfoFragment;
 import jungen.com.cashtracker.view.fragment.PurchaseListFragment;
 
 public class MainActivity extends AppCompatActivity implements
-        PurchaseListFragment.OnPurchaseListFragmentInteractionListener, PurchaseInfoFragment.OnPurchaseInfoFragmentInteractionListener {
+        NavigationView.OnNavigationItemSelectedListener,
+        PurchaseListFragment.OnPurchaseListFragmentInteractionListener,
+        PurchaseInfoFragment.OnPurchaseInfoFragmentInteractionListener {
     public static final int REQUEST_FINISH = -1;
     /**
      * Reference to purchase node of the current user
@@ -35,22 +43,36 @@ public class MainActivity extends AppCompatActivity implements
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close
+        );
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
+        navView.setNavigationItemSelectedListener(this);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        if (mPurchaseListFragment == null)
+        if (mPurchaseListFragment == null) {
             mPurchaseListFragment = PurchaseListFragment.newInstance();
+        }
 
-        if (mPurchaseInfoFragment == null)
+        if (mPurchaseInfoFragment == null) {
             mPurchaseInfoFragment = PurchaseInfoFragment.newInstance();
+        }
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragmentPurchaseListContainer, mPurchaseListFragment)
                 .replace(R.id.fragmentPurchaseInfoContainer, mPurchaseInfoFragment)
                 .commit();
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -67,7 +89,6 @@ public class MainActivity extends AppCompatActivity implements
         }
         return super.onOptionsItemSelected(item);
     }
-
 
     public void fabOnClick(View view) {
         Intent intent = new Intent(this, AddPurchaseActivity.class);
@@ -104,5 +125,43 @@ public class MainActivity extends AppCompatActivity implements
         intent.putExtra(AddPurchaseActivity.KEY_POSITION, position);
         intent.putExtra(Purchase.class.getSimpleName(), purchase);
         startActivityForResult(intent, AddPurchaseActivity.REQUEST_EDIT_PURCHASE);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        String message = "None";
+        switch (item.getItemId()) {
+            case R.id.nav_interval_alltime:
+                message = "all time";
+                break;
+            case R.id.nav_interval_year:
+                message = "year";
+                break;
+            case R.id.nav_interval_month:
+                message = "month";
+                break;
+            case R.id.nav_interval_week:
+                message = "week";
+                break;
+            case R.id.nav_interval_day:
+                message = "day";
+                break;
+        }
+        Snackbar.make(findViewById(R.id.coordinator_layout), message, Snackbar.LENGTH_LONG).show();
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
     }
 }

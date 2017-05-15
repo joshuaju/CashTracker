@@ -2,12 +2,18 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="wrap_content"
+    android:gravity="bottom|right"
+    android:orientation="vertical"
+    android:layout_marginTop="16dp"
+    android:padding="@dimen/nav_header_vertical_spacing"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="CashTracker Drawer"/>
+        android:text="@string/app_name"
+        android:textAppearance="@android:style/TextAppearance.Material.Title"
+        android:textColor="#000000"/>
 
 </LinearLayout>

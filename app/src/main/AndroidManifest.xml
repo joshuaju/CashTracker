@@ -17,7 +17,8 @@
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
-            android:name=".view.activity.SignInActivity">
+            android:name=".view.activity.SignInActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter
                 android:label="@string/app_name">
                 <action android:name="android.intent.action.MAIN"/>

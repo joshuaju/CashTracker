@@ -4,9 +4,8 @@ import com.google.firebase.database.Exclude;
 
 import java.io.Serializable;
 import java.util.Calendar;
-import java.util.Date;
 
-import jungen.com.cashtracker.misc.DateFormatHelper;
+import jungen.com.cashtracker.misc.DateHelper;
 
 
 /**
@@ -71,6 +70,6 @@ public class Purchase implements Serializable {
     public String getTimeAsString(){
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(getTime());
-        return DateFormatHelper.format(cal);
+        return DateHelper.format(cal);
     }
 }

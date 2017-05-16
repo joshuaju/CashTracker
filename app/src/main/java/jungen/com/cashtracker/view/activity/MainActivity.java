@@ -1,9 +1,13 @@
 package jungen.com.cashtracker.view.activity;
 
+import static jungen.com.cashtracker.misc.DateHelper.getEndOfYear;
+import static jungen.com.cashtracker.misc.DateHelper.getStartOfDay;
+import static jungen.com.cashtracker.misc.DateHelper.getStartOfYear;
+
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
@@ -17,9 +21,12 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
+
+import java.util.Calendar;
 
 import jungen.com.cashtracker.R;
+import jungen.com.cashtracker.misc.DateHelper;
 import jungen.com.cashtracker.misc.FirebaseNodes;
 import jungen.com.cashtracker.model.Purchase;
 import jungen.com.cashtracker.view.fragment.PurchaseInfoFragment;
@@ -71,6 +78,10 @@ public class MainActivity extends AppCompatActivity implements
                 .replace(R.id.fragmentPurchaseListContainer, mPurchaseListFragment)
                 .replace(R.id.fragmentPurchaseInfoContainer, mPurchaseInfoFragment)
                 .commit();
+
+        // TODO This currently crashes the app
+        int lastInterval = loadInterval();
+        updateInterval(lastInterval);
     }
 
 
@@ -129,30 +140,81 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        String message = "None";
-        switch (item.getItemId()) {
+        saveInterval(item.getItemId());
+
+        updateInterval(item.getItemId());
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    private void saveInterval(int id){
+        SharedPreferences sharedPref = getSharedPreferences("SavedStates",0);
+        SharedPreferences.Editor prefEditor = sharedPref.edit();
+        prefEditor.putInt("last-interval", id);
+        prefEditor.commit();
+    }
+
+    private int loadInterval(){
+        SharedPreferences sharedPref = getSharedPreferences("SavedStates", MODE_PRIVATE);
+        int position = sharedPref.getInt("last-interval",-1);
+        return position;
+    }
+
+    private void updateInterval(int id){
+        String message = "";
+
+        Calendar start = Calendar.getInstance();
+        start.setFirstDayOfWeek(Calendar.MONDAY);
+
+        Calendar end = Calendar.getInstance();
+        end.setFirstDayOfWeek(Calendar.MONDAY);
+        switch (id) {
             case R.id.nav_interval_alltime:
                 message = "all time";
                 break;
             case R.id.nav_interval_year:
+                start = DateHelper.getStartOfYear(start);
+                end = DateHelper.getEndOfYear(end);
                 message = "year";
                 break;
             case R.id.nav_interval_month:
+                start = DateHelper.getStartOfMonth(start);
+                end = DateHelper.getEndOfMonth(end);
                 message = "month";
                 break;
             case R.id.nav_interval_week:
+                start = DateHelper.getStartOfWeek(start);
+                end = DateHelper.getEndOFWeek(end);
                 message = "week";
                 break;
             case R.id.nav_interval_day:
+                start = DateHelper.getStartOfDay(start);
+                end = DateHelper.getEndOfDay(end);
                 message = "day";
                 break;
+            default: return;
         }
-        Snackbar.make(findViewById(R.id.coordinator_layout), message, Snackbar.LENGTH_LONG).show();
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+        FirebaseNodes nodes = FirebaseNodes.getInstance();
+        if (id == R.id.nav_interval_alltime) {
+            nodes.setPurchaseQuery(null);
+        } else {
+            long startInMillis = start.getTimeInMillis();
+            long endInMillis = end.getTimeInMillis();
+            nodes.clearPurchaseQuery(false);
+            Query query = nodes.getQueriedPurchases().startAt(startInMillis).endAt(endInMillis);
 
-        return true;
+            nodes.setPurchaseQuery(query);
+        }
+
+        String s = DateHelper.format(start);
+        String e = DateHelper.format(end);
+        message += ": " + s + " - " + e;
+
+        Snackbar.make(findViewById(R.id.coordinator_layout), "Interval set to " + message,
+                Snackbar.LENGTH_SHORT).show();
     }
 
     @Override

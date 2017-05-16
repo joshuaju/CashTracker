@@ -42,8 +42,7 @@ public class PurchaseListFragment extends Fragment implements AbsListView.MultiC
     FirebaseListAdapter<Purchase> purchaseListAdapter;
 
     public PurchaseListFragment() {
-        PurchaseQueryPublisher publisher = FirebaseNodes.getInstance();
-        publisher.subscribe(this);
+
     }
 
     /**
@@ -72,6 +71,8 @@ public class PurchaseListFragment extends Fragment implements AbsListView.MultiC
         lvPurchaseList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         lvPurchaseList.setMultiChoiceModeListener(this);
 
+        PurchaseQueryPublisher publisher = FirebaseNodes.getInstance();
+        publisher.subscribe(this);
         updateQueryChanged();
         return view;
     }

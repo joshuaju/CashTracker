@@ -22,7 +22,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 
 import jungen.com.cashtracker.R;
-import jungen.com.cashtracker.misc.DateFormatHelper;
+import jungen.com.cashtracker.misc.DateHelper;
 import jungen.com.cashtracker.misc.FirebaseNodes;
 import jungen.com.cashtracker.model.Purchase;
 
@@ -124,7 +124,7 @@ public class AddPurchaseActivity extends AppCompatActivity implements
         }
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(mPurchase.getTime());
-        btnDate.setText(DateFormatHelper.format(calendar));
+        btnDate.setText(DateHelper.format(calendar));
 
     }
 
@@ -202,7 +202,7 @@ public class AddPurchaseActivity extends AppCompatActivity implements
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(year, month, dayOfMonth);
-        String date = DateFormatHelper.format(calendar);
+        String date = DateHelper.format(calendar);
 
         Button btnDate = (Button) findViewById(R.id.btnTime);
         btnDate.setText(date);
